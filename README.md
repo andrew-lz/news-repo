@@ -6,8 +6,8 @@
 
 # Build and Runtime Requirements
 
-Xcode 6.0 or later
-iOS 8.0 or later
+1. Xcode 6.0 or later
+2. iOS 8.0 or later
 
 # Steps:
 
