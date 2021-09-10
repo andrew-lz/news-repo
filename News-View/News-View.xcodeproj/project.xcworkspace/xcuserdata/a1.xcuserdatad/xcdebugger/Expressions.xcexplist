@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "UITapGestureRecognizer.didTapAttributedTextInLabel(label:inRange:):UITapGestureExt.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CustomTableViewCell.tappedOnLabel(_:):CustomTableViewCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "fullText">
+            </PersistentString>
+            <PersistentString
+               value = "content.numberOfLines">
+            </PersistentString>
+            <PersistentString
+               value = "content.attributedText">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "UITapGestureRecognizer.didTapAttributedTextInLabel(cell:label:inRange:):UITapGestureExt.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "textBoundingBox.size">
+            </PersistentString>
+            <PersistentString
+               value = "self.location(in: cell)">
+            </PersistentString>
+            <PersistentString
+               value = "cell.bounds.size">
+            </PersistentString>
+            <PersistentString
+               value = "label.bounds.size">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
