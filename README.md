@@ -9,6 +9,15 @@
 1. Xcode 6.0 or later
 2. iOS 8.0 or later
 
+# Configuring the Project
+
+Open the project in the Project navigator within Xcode and select each of the targets. Set the Team on the General tab to the team associated with your developer account.
+
+Change the Bundle Identifier.
+With the project's General tab still open, update the Bundle Identifier value. The project's News-View target ships with the value:
+
+com.example.apple-samplecode.News-View
+
 # Steps:
 
 1. git clone https://github.com/andrew-lz/news-repo
