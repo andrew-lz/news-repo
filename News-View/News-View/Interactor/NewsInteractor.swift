@@ -17,6 +17,7 @@ class NewsInteractor: NewsDataInteractor {
     
     required init(newsView: NewsView) {
         self.newsView = newsView
+        newsView.setDelegate(interactor: self)
         resetDaysQuantity()
     }
     

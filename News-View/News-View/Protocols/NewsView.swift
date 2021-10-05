@@ -13,4 +13,5 @@ protocol NewsView {
     func resetModel()
     func startAnimation()
     func stopAnimation()
+    func setDelegate(interactor: NewsDataInteractor)
 }

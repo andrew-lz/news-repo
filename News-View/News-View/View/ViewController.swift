@@ -33,11 +33,14 @@ class ViewController: UITableViewController, NewsView, VCDelegate, UISearchResul
     }
     override init(style: UITableView.Style) {
         super.init(style: style)
-        interactor = NewsInteractor(newsView: self)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setDelegate(interactor: NewsDataInteractor) {
+        self.interactor = interactor
     }
     
     func resetModel() {
