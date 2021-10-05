@@ -12,19 +12,18 @@ class NewsInteractor: NewsDataInteractor {
     
     private let newsView: NewsView
     private let networkDataFetcher = NetworkDataFetcher()
-    private var dayNumber: Int?
+    private var dayNumber: Int = 1
     private let daysQuantityBeforeRefresh = 8
     
     required init(newsView: NewsView) {
         self.newsView = newsView
         newsView.setDelegate(interactor: self)
-        resetDaysQuantity()
     }
     
     func loadNews() {
         newsView.startAnimation()
         var newsModels = [NewsModel]()
-        networkDataFetcher.loadNewsPage(before: dayNumber!, then: { news in
+        networkDataFetcher.loadNewsPage(before: dayNumber, then: { news in
             news.articles.forEach { article in
                 newsModels.append(NewsModel(title: article.title ?? "No Title", author: article.author, description: article.description, image: UIImage(data: try! Data(contentsOf: URL(string: article.urlToImage ?? "https://s2.coinmarketcap.com/static/img/coins/200x200/1.png")!))!, publishedAt: article.publishedAt))
                 print(article.title ?? "No Title")
@@ -32,7 +31,7 @@ class NewsInteractor: NewsDataInteractor {
             self.newsView.configure(newsModels: newsModels)
             self.newsView.stopAnimation()
         })
-        dayNumber! += 1
+        dayNumber += 1
     }
     
     func refresh() {
