@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol NewsDataInteractor {
+protocol NewsDataInteractor: AnyObject {
     func refresh()
     func loadNews()
     func didStart()
