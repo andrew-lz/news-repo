@@ -10,8 +10,9 @@ import Foundation
 class NetworkDataFetcher {
     
     private let networkService = NetworkService()
-    private let apiKey = "19aca4fda67d47f3b866f0ee8028f6fd"
-    //           "220fba25b6d14383908e89872d1136da"
+    private let apiKey =
+        //        "19aca4fda67d47f3b866f0ee8028f6fd"
+        "220fba25b6d14383908e89872d1136da"
     //           "f1aa354959d04f21b021d83392ce310a"
     
     private func fetchNews(urlString: String, response: @escaping (NewsResponse?) -> Void) {
@@ -34,8 +35,7 @@ class NetworkDataFetcher {
     private func formUrl(before daysQuantity: Int) -> String {
         let language = "en"
         let q = "bitcoin"
-        let from = Date().getDate(before: daysQuantity)
-        let to =  Date().getDate(before: daysQuantity - 1)
+        let pageSize = "10"
         let scheme = "https"
         let host = "newsapi.org"
         let path = "/v2/everything"
@@ -44,8 +44,8 @@ class NetworkDataFetcher {
             "apiKey": apiKey,
             "language": language,
             "q": q,
-            "from": from,
-            "to": to
+            "pageSize": pageSize,
+            "page": String(daysQuantity)
         ]
         
         var urlComponents = URLComponents()
@@ -88,12 +88,6 @@ extension URLComponents {
     
     mutating func setQueryItems(with parameters: [String: String]) {
         self.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
-    }
-}
-
-extension Date {
-    func getDate(before daysQuantity: Int) -> String{
-        return ISO8601DateFormatter().string(from: Calendar.current.date(byAdding: .day, value: -daysQuantity, to: self)!)
     }
 }
 

@@ -10,6 +10,8 @@ import UIKit
 
 class CustomTableViewCell: UITableViewCell {
     
+    private var delegate: VCDelegate?
+    
     private let numberOfCharactersOnFourLines: Int = 109
     
     private var fullText: NSAttributedString?
@@ -65,6 +67,7 @@ class CustomTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        delegate = ViewController(style: .plain)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
         content.addGestureRecognizer(tapGesture)
         contentView.addSubview(title)
@@ -127,7 +130,7 @@ class CustomTableViewCell: UITableViewCell {
         if gesture.didTapAttributedTextInLabel(cell: self, label: content, inRange: readmoreRange) {
             content.numberOfLines = 0
             content.attributedText = fullText
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "didTapOnReadmore"), object: nil)
+            delegate?.updateTableView()
         }
     }
     

@@ -7,9 +7,9 @@
 
 import UIKit
 
-class ViewController: UITableViewController, NewsView, UISearchResultsUpdating {
+class ViewController: UITableViewController, NewsView, VCDelegate, UISearchResultsUpdating {
     
-    private var changedCell: CustomTableViewCell?
+    private var interactor: NewsDataInteractor?
     
     private var newsModels: [NewsModel] = []
     
@@ -33,18 +33,11 @@ class ViewController: UITableViewController, NewsView, UISearchResultsUpdating {
     }
     override init(style: UITableView.Style) {
         super.init(style: style)
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "didTapOnReadmore"), object: nil, queue: OperationQueue.current) { _ in
-            self.tableView.beginUpdates()
-            self.tableView.endUpdates()
-        }
+        interactor = NewsInteractor(newsView: self)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
     
     func resetModel() {
@@ -52,11 +45,14 @@ class ViewController: UITableViewController, NewsView, UISearchResultsUpdating {
         reloadData()
     }
     
+    func updateTableView() {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+    
     func reloadData() {
         tableView.reloadData()
     }
-    
-    
     
     func startAnimation() {
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +77,7 @@ class ViewController: UITableViewController, NewsView, UISearchResultsUpdating {
     }
     
     @objc private func refresh() {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "pulledToRefresh"), object: nil)
+        interactor?.refresh()
         refreshControl?.endRefreshing()
     }
     
@@ -136,10 +132,11 @@ extension ViewController {
         }
         return cell
     }
-    
+
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if (indexPath.row == (newsModels.count - 1)) {
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "didScrollToTheEnd"), object: nil)
+            print("loadNews in VC")
+            interactor?.loadNews()
         }
     }
     
