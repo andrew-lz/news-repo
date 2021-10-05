@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UITableViewController, NewsView, VCDelegate, UISearchResultsUpdating {
+class ViewController: UITableViewController, NewsView, ViewControllerDelegate, UISearchResultsUpdating {
     
     private var interactor: NewsDataInteractor?
     

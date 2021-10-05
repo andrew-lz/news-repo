@@ -20,7 +20,7 @@
 		63A549EB26E16609000F5BFE /* NewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A549EA26E16609000F5BFE /* NewsModel.swift */; };
 		63C9D05726EBE9CA00588201 /* NewsRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C9D05626EBE9CA00588201 /* NewsRouter.swift */; };
 		63F974F326E8D75D00C207C7 /* UILabelExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F974F226E8D75D00C207C7 /* UILabelExt.swift */; };
-		E313BAD8270B2F0300456A69 /* VCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E313BAD7270B2F0300456A69 /* VCDelegate.swift */; };
+		E313BAD8270B2F0300456A69 /* ViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E313BAD7270B2F0300456A69 /* ViewControllerDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,7 +39,7 @@
 		63A549EA26E16609000F5BFE /* NewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsModel.swift; sourceTree = "<group>"; };
 		63C9D05626EBE9CA00588201 /* NewsRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRouter.swift; sourceTree = "<group>"; };
 		63F974F226E8D75D00C207C7 /* UILabelExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExt.swift; sourceTree = "<group>"; };
-		E313BAD7270B2F0300456A69 /* VCDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCDelegate.swift; sourceTree = "<group>"; };
+		E313BAD7270B2F0300456A69 /* ViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -97,7 +97,7 @@
 			children = (
 				6391C25426E0B6960061426F /* NewsDataInteractor.swift */,
 				6391C25626E0B6F30061426F /* NewsView.swift */,
-				E313BAD7270B2F0300456A69 /* VCDelegate.swift */,
+				E313BAD7270B2F0300456A69 /* ViewControllerDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -228,7 +228,7 @@
 				6327425426E00A920016E7BD /* CustomTableViewCell.swift in Sources */,
 				6391C25726E0B6F30061426F /* NewsView.swift in Sources */,
 				6327424D26E006EF0016E7BD /* NewsResponse.swift in Sources */,
-				E313BAD8270B2F0300456A69 /* VCDelegate.swift in Sources */,
+				E313BAD8270B2F0300456A69 /* ViewControllerDelegate.swift in Sources */,
 				639CB2CE26E004D600EE0A6E /* ViewController.swift in Sources */,
 				639CB2CA26E004D500EE0A6E /* AppDelegate.swift in Sources */,
 				63F974F326E8D75D00C207C7 /* UILabelExt.swift in Sources */,

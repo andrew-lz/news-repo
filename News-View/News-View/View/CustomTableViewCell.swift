@@ -10,7 +10,7 @@ import UIKit
 
 class CustomTableViewCell: UITableViewCell {
     
-    private weak var delegate: VCDelegate?
+    private weak var delegate: ViewControllerDelegate?
     
     private let numberOfCharactersOnFourLines: Int = 109
     
@@ -123,7 +123,7 @@ class CustomTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDelegate(delegate: VCDelegate) {
+    func setDelegate(delegate: ViewControllerDelegate) {
         self.delegate = delegate
     }
     
