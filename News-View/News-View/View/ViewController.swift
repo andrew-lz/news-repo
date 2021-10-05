@@ -125,6 +125,7 @@ extension ViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CustomTableViewCell.identifier, for: indexPath) as! CustomTableViewCell
+        cell.setDelegate(delegate: self)
         if searchController.isActive {
             cell.configure(with: searchResults[indexPath.row])
         } else {

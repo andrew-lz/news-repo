@@ -10,7 +10,7 @@ import UIKit
 
 class CustomTableViewCell: UITableViewCell {
     
-    private var delegate: VCDelegate?
+    private weak var delegate: VCDelegate?
     
     private let numberOfCharactersOnFourLines: Int = 109
     
@@ -67,7 +67,6 @@ class CustomTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        delegate = ViewController(style: .plain)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
         content.addGestureRecognizer(tapGesture)
         contentView.addSubview(title)
@@ -124,6 +123,10 @@ class CustomTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setDelegate(delegate: VCDelegate) {
+        self.delegate = delegate
+    }
+    
     @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
         guard let text = content.text else { return }
         let readmoreRange = (text as NSString).range(of: "...Readmore")
@@ -138,6 +141,7 @@ class CustomTableViewCell: UITableViewCell {
         let truncatedDescription = "Description:\n\(newsDescription.prefix(90))"
         let description = NSMutableAttributedString(string: truncatedDescription, attributes: myAttribute)
         fullText = NSAttributedString(string: "Description:\n\(newsDescription)", attributes: myAttribute)
+        print(fullText ?? "Text")
         content.attributedText = description
         
         if fullText!.length >= numberOfCharactersOnFourLines {
