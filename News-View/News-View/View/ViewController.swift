@@ -7,15 +7,17 @@
 
 import UIKit
 
-class ViewController: UITableViewController, NewsView, ViewControllerDelegate, UISearchResultsUpdating {
+class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
+    
+    var lastClick: TimeInterval?
+    
+    var lastIndexPath: IndexPath?
     
     private var interactor: NewsDataInteractor?
     
-    private var newsModels: [NewsModel] = []
+    private var newsModels: [ArticleViewModel] = []
     
-    private var searchResults: [NewsModel] = []
-    
-    private var searchController: UISearchController!
+    private var searchController: UISearchController?
     
     private let loadingIndicator: UIActivityIndicatorView = {
         let loadingIndicator = UIActivityIndicatorView()
@@ -27,8 +29,8 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate, U
         return loadingIndicator
     }()
     
-    func configure(newsModels: [NewsModel]) {
-        self.newsModels.append(contentsOf: newsModels)
+    func configure(newsModels: [ArticleViewModel]) {
+        self.newsModels = newsModels
         reloadData()
     }
     override init(style: UITableView.Style) {
@@ -57,17 +59,17 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate, U
         tableView.reloadData()
     }
     
-    func startAnimation() {
+    func startAnimation(isHidden: Bool) {
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
         loadingIndicator.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
         loadingIndicator.centerYAnchor.constraint(equalTo: view.layoutMarginsGuide.centerYAnchor).isActive = true
-        searchController.searchBar.isHidden = true
+        searchController?.searchBar.isHidden = isHidden
         loadingIndicator.startAnimating()
     }
     
     func stopAnimation() {
         loadingIndicator.stopAnimating()
-        searchController.searchBar.isHidden = false
+        searchController?.searchBar.isHidden = false
     }
     
     override func viewDidLoad() {
@@ -76,11 +78,13 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate, U
         setupRefreshControl()
         tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: CustomTableViewCell.identifier)
         setupSearchBar()
-        updateSearchResults(for: searchController)
+        //        updateSearchResults(for: searchController)
     }
     
     @objc private func refresh() {
         interactor?.refresh()
+        searchController?.searchBar.isHidden = true
+        searchController?.isActive = false
         refreshControl?.endRefreshing()
     }
     
@@ -93,25 +97,21 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate, U
     
     private func setupSearchBar() {
         searchController = UISearchController(searchResultsController: nil)
-        tableView.tableHeaderView = searchController.searchBar
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search by Title"
-        searchController.searchBar.tintColor = .cyan
+        searchController?.obscuresBackgroundDuringPresentation = false
+        searchController?.searchBar.placeholder = "Search by Title"
+        searchController?.searchBar.tintColor = .cyan
+        searchController?.searchBar.delegate = self
+        tableView.tableHeaderView = searchController?.searchBar
     }
     
-    private func filterContentForSearchText(_ searchText: String) {
-        searchResults = newsModels.filter({ (news: NewsModel) -> Bool in
-            let titleMatch = news.title.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
-            return titleMatch != nil
-        }
-        )
+    @objc private func filter() {
+        guard let searchText = searchController?.searchBar.text else { return }
+        interactor?.filterSearch(searchText: searchText)
     }
     
     func updateSearchResults(for searchController: UISearchController) {
-        if let searchText = searchController.searchBar.text {
-            filterContentForSearchText(searchText)
-            tableView.reloadData()
+        if searchController.searchBar.text != "" {
+            perform(#selector(filter), with: nil, afterDelay: 2.0)
         }
     }
 }
@@ -119,38 +119,35 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate, U
 extension ViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController.isActive {
-            return searchResults.count
-        } else {
-            return newsModels.count
-        }
+        return newsModels.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CustomTableViewCell.identifier, for: indexPath) as! CustomTableViewCell
         cell.setDelegate(delegate: self)
-        if searchController.isActive {
-            cell.configure(with: searchResults[indexPath.row])
-        } else {
-            cell.configure(with: newsModels[indexPath.row])
-        }
+        cell.configure(with: newsModels[indexPath.row])
         return cell
-    }
-
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if (indexPath.row == (newsModels.count - 1)) {
-            print("loadNews in VC")
-            interactor?.loadNews()
-        }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("User tapped on item \(indexPath.row + 1)")
-        tableView.deselectRow(at: indexPath, animated: true)
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if tableView.contentSize.height - tableView.frame.height < tableView.contentOffset.y {
+            if searchController?.isActive == false {
+                interactor?.loadNews()
+            }
+        }
     }
 }
 
+extension ViewController: UISearchBarDelegate {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        interactor?.didTapCancelSearch()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        interactor?.filterSearch(searchText: searchBar.text ?? "")
+    }
+}

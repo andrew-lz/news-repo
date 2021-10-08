@@ -8,10 +8,10 @@
 import Foundation
 
 protocol NewsView {
-    func configure(newsModels: [NewsModel])
+    func configure(newsModels: [ArticleViewModel])
     func reloadData()
     func resetModel()
-    func startAnimation()
+    func startAnimation(isHidden: Bool)
     func stopAnimation()
     func setDelegate(interactor: NewsDataInteractor)
 }
