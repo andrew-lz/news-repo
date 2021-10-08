@@ -10,6 +10,8 @@ import UIKit
 
 class CustomTableViewCell: UITableViewCell {
     
+    private weak var delegate: ViewControllerDelegate?
+    
     private let numberOfCharactersOnFourLines: Int = 109
     
     private var fullText: NSAttributedString?
@@ -121,13 +123,17 @@ class CustomTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setDelegate(delegate: ViewControllerDelegate) {
+        self.delegate = delegate
+    }
+    
     @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
         guard let text = content.text else { return }
         let readmoreRange = (text as NSString).range(of: "...Readmore")
         if gesture.didTapAttributedTextInLabel(cell: self, label: content, inRange: readmoreRange) {
             content.numberOfLines = 0
             content.attributedText = fullText
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "didTapOnReadmore"), object: nil)
+            delegate?.updateTableView()
         }
     }
     
@@ -135,6 +141,7 @@ class CustomTableViewCell: UITableViewCell {
         let truncatedDescription = "Description:\n\(newsDescription.prefix(90))"
         let description = NSMutableAttributedString(string: truncatedDescription, attributes: myAttribute)
         fullText = NSAttributedString(string: "Description:\n\(newsDescription)", attributes: myAttribute)
+        print(fullText ?? "Text")
         content.attributedText = description
         
         if fullText!.length >= numberOfCharactersOnFourLines {
