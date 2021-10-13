@@ -7,9 +7,9 @@
 
 import UIKit
 
-class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
+class ViewController: UITableViewController, NewsView, TableViewCellDelegate {
     
-    private var interactor: NewsInteractorDelegate?
+    private var interactor: NewsViewDelegate?
     
     private var newsModels: [ArticleViewModel] = []
     
@@ -37,7 +37,7 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDelegate(interactor: NewsInteractorDelegate) {
+    func setDelegate(interactor: NewsViewDelegate) {
         self.interactor = interactor
     }
     
@@ -74,7 +74,6 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
         setupRefreshControl()
         tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: CustomTableViewCell.identifier)
         setupSearchBar()
-        //        updateSearchResults(for: searchController)
     }
     
     @objc private func refresh() {

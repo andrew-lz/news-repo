@@ -8,10 +8,11 @@
 import Foundation
 import UIKit
 
-struct ArticleViewModel {
+struct ArticleViewModel: ViewModelProtocol {
     let title: String
     let author: String?
     let description: String
     let image: UIImage
     let publishedAt: String
+    var isLiked: Bool = false
 }

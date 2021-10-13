@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-class NewsInteractor: NewsInteractorDelegate {
-    
+class NewsInteractor: NewsViewDelegate {
+
     private let newsView: NewsView
     private let networkDataFetcher: NetworkProtocol
     private var dayNumber: Int = 1
@@ -88,9 +88,11 @@ class NewsInteractor: NewsInteractorDelegate {
         return newsModels
     }
     
-    func previousArticlesCount() -> Int{
-        return articles.count
-    }
+    func saveArticle(index: Int, isLiked: Bool) {}
+    
+    func deleteArticle(index: Int, isLiked: Bool) {}
+    
+    func configureFavouriteArticles() {}
     
     func refresh() {
         newsView.resetModel()
