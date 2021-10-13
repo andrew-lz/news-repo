@@ -8,8 +8,8 @@
 import Foundation
 import UIKit
 
-class NewsInteractor: NewsViewDelegate {
-
+class NewsInteractor: NewsInteractorProtocol {
+    
     private let newsView: NewsView
     private let networkDataFetcher: NetworkProtocol
     private var dayNumber: Int = 1
@@ -80,19 +80,16 @@ class NewsInteractor: NewsViewDelegate {
                 .loadImageFromUrl(stringUrl: article.urlToImage)
                 .flatMap { UIImage(data: $0) } ?? UIImage()
             return ArticleViewModel(title: article.title ?? "No Title",
-                      author: article.author,
-                      description: article.description,
-                      image: image,
-                      publishedAt: article.publishedAt)
+                                    author: article.author,
+                                    description: article.description,
+                                    image: image,
+                                    publishedAt: article.publishedAt, isLiked: false)
         }
         return newsModels
     }
     
-    func saveArticle(index: Int, isLiked: Bool) {}
-    
-    func deleteArticle(index: Int, isLiked: Bool) {}
-    
-    func configureFavouriteArticles() {}
+    // TODO: NR-3 add logic
+    func likeOrUnlikeArticle(index: Int, isLiked: Bool) {}
     
     func refresh() {
         newsView.resetModel()

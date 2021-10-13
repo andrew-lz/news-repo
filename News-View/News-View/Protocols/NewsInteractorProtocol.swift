@@ -7,14 +7,12 @@
 
 import Foundation
 
-protocol NewsViewDelegate: AnyObject {
+protocol NewsInteractorProtocol: AnyObject {
     func refresh()
     func loadNews()
     func didStart()
     func filterSearch(searchText: String)
     func didTapCancelSearch()
-    func saveArticle(index: Int, isLiked: Bool)
-    func deleteArticle(index: Int, isLiked: Bool)
-    func configureFavouriteArticles()
+    func likeOrUnlikeArticle(index: Int, isLiked: Bool)
 }
 

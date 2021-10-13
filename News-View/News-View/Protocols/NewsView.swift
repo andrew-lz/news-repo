@@ -13,7 +13,5 @@ protocol NewsView {
     func resetModel()
     func startAnimation(isSearchBarHidden: Bool)
     func stopAnimation()
-    func setDelegate(interactor: NewsViewDelegate)
+    func setDelegate(interactor: NewsInteractorProtocol)
 }
-
-

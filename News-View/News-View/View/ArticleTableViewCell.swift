@@ -8,9 +8,9 @@
 import Foundation
 import UIKit
 
-class CustomTableViewCell: UITableViewCell {
+class ArticleTableViewCell: UITableViewCell {
     
-    private weak var delegate: TableViewCellDelegate?
+    private weak var delegate: ArticleTableViewCellDelegate?
     
     private let numberOfCharactersOnFourLines: Int = 109
     
@@ -138,7 +138,7 @@ class CustomTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDelegate(delegate: TableViewCellDelegate) {
+    func setDelegate(delegate: ArticleTableViewCellDelegate) {
         self.delegate = delegate
     }
     
