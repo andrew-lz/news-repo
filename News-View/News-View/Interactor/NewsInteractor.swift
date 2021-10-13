@@ -8,23 +8,24 @@
 import Foundation
 import UIKit
 
-class NewsInteractor: NewsDataInteractor {
+class NewsInteractor: NewsInteractorDelegate {
     
     private let newsView: NewsView
-    private let networkDataFetcher = NetworkDataFetcher()
+    private let networkDataFetcher: NetworkProtocol
     private var dayNumber: Int = 1
     private let daysQuantityBeforeRefresh = 8
     private var articles: [Article] = []
     
     private var filterStartTimer: Timer?
     
-    required init(newsView: NewsView) {
+    required init(newsView: NewsView, networkService: NetworkProtocol) {
         self.newsView = newsView
+        self.networkDataFetcher = networkService
         newsView.setDelegate(interactor: self)
     }
     
     func loadNews() {
-        newsView.startAnimation(isHidden: false)
+        newsView.startAnimation(isSearchBarHidden: false)
         networkDataFetcher.loadNewsPage(before: dayNumber, then: { articles in
             self.articles.append(contentsOf: articles)
             self.newsView.configure(newsModels: self.createNewsModels(articles: self.articles))
@@ -47,7 +48,7 @@ class NewsInteractor: NewsDataInteractor {
     
     func filterSearch(searchText: String) {
         guard !searchText.isEmpty else { return }
-        newsView.startAnimation(isHidden: false)
+        newsView.startAnimation(isSearchBarHidden: false)
         
         if filterStartTimer == nil {
             filterStartTimer = makeFilterTimer(for: searchText)

@@ -9,11 +9,7 @@ import UIKit
 
 class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
     
-    var lastClick: TimeInterval?
-    
-    var lastIndexPath: IndexPath?
-    
-    private var interactor: NewsDataInteractor?
+    private var interactor: NewsInteractorDelegate?
     
     private var newsModels: [ArticleViewModel] = []
     
@@ -41,7 +37,7 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setDelegate(interactor: NewsDataInteractor) {
+    func setDelegate(interactor: NewsInteractorDelegate) {
         self.interactor = interactor
     }
     
@@ -59,11 +55,11 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
         tableView.reloadData()
     }
     
-    func startAnimation(isHidden: Bool) {
+    func startAnimation(isSearchBarHidden: Bool) {
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
         loadingIndicator.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
         loadingIndicator.centerYAnchor.constraint(equalTo: view.layoutMarginsGuide.centerYAnchor).isActive = true
-        searchController?.searchBar.isHidden = isHidden
+        searchController?.searchBar.isHidden = isSearchBarHidden
         loadingIndicator.startAnimating()
     }
     

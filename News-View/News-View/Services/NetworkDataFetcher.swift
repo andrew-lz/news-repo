@@ -7,7 +7,7 @@
 
 import Foundation
 
-class NetworkDataFetcher {
+class NetworkDataFetcher: NetworkProtocol {
     
     private let networkService = NetworkService()
     private let apiKey =
