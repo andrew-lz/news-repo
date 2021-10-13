@@ -11,4 +11,6 @@ protocol NewsDataInteractor: AnyObject {
     func refresh()
     func loadNews()
     func didStart()
+    func filterSearch(searchText: String)
+    func didTapCancelSearch()
 }

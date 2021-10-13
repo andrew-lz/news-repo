@@ -65,16 +65,31 @@ class CustomTableViewCell: UITableViewCell {
         return content
     }()
     
+    private let favourite: UILabel = {
+        let favourite = UILabel()
+        favourite.text = "🤍"
+        favourite.sizeToFit()
+        favourite.translatesAutoresizingMaskIntoConstraints = false
+        favourite.isUserInteractionEnabled = true
+        return favourite
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
         content.addGestureRecognizer(tapGesture)
+        contentView.addSubview(favourite)
         contentView.addSubview(title)
         contentView.addSubview(author)
         contentView.addSubview(publishedAt)
         contentView.addSubview(newsImageView)
         contentView.addSubview(content)
         NSLayoutConstraint.activate([
+            favourite.topAnchor
+                .constraint(equalTo: contentView.topAnchor),
+            favourite.rightAnchor
+                .constraint(equalTo: contentView.rightAnchor),
+            
             title.leftAnchor
                 .constraint(equalTo: contentView.leftAnchor),
             title.rightAnchor
@@ -127,6 +142,14 @@ class CustomTableViewCell: UITableViewCell {
         self.delegate = delegate
     }
     
+    func addToFavourites() {
+        if favourite.text == "❤️" {
+            favourite.text = "🤍"
+        } else {
+        favourite.text = "❤️"
+        }
+    }
+    
     @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
         guard let text = content.text else { return }
         let readmoreRange = (text as NSString).range(of: "...Readmore")
@@ -141,7 +164,6 @@ class CustomTableViewCell: UITableViewCell {
         let truncatedDescription = "Description:\n\(newsDescription.prefix(90))"
         let description = NSMutableAttributedString(string: truncatedDescription, attributes: myAttribute)
         fullText = NSAttributedString(string: "Description:\n\(newsDescription)", attributes: myAttribute)
-        print(fullText ?? "Text")
         content.attributedText = description
         
         if fullText!.length >= numberOfCharactersOnFourLines {
@@ -151,7 +173,7 @@ class CustomTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(with newsModel: NewsModel) {
+    func configure(with newsModel: ArticleViewModel) {
         title.attributedText = NSAttributedString(string: "Title: \n\(newsModel.title)", attributes: myAttribute)
         author.attributedText = NSAttributedString(string: "Author: \n\(newsModel.author ?? "Unknown")", attributes: myAttribute)
         publishedAt.attributedText = NSAttributedString(string: "Published at: \n\(newsModel.publishedAt.components(separatedBy: "T")[0])", attributes: myAttribute)

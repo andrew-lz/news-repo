@@ -11,8 +11,8 @@ class NetworkDataFetcher {
     
     private let networkService = NetworkService()
     private let apiKey =
-        //        "19aca4fda67d47f3b866f0ee8028f6fd"
-        "220fba25b6d14383908e89872d1136da"
+        "19aca4fda67d47f3b866f0ee8028f6fd"
+    //        "220fba25b6d14383908e89872d1136da"
     //           "f1aa354959d04f21b021d83392ce310a"
     
     private func fetchNews(urlString: String, response: @escaping (NewsResponse?) -> Void) {
@@ -57,12 +57,18 @@ class NetworkDataFetcher {
         return urlComponents.url!.absoluteString
     }
     
-    func loadNewsPage(before daysQuantity: Int, then handler: @escaping (NewsResponse) -> Void) {
+    func loadNewsPage(before daysQuantity: Int, then handler: @escaping ([Article]) -> Void) {
         let url: String = formUrl(before: daysQuantity)
         fetchNews(urlString: url) { news in
             guard let news = news else { return }
-            handler(news)
+            handler(news.articles)
         }
+    }
+    
+    func loadImageFromUrl(stringUrl: String?) -> Data? {
+        guard let imageUrl: URL  = URL(string: stringUrl ?? "https://s2.coinmarketcap.com/static/img/coins/200x200/1.png"),
+              let imageData = try? Data(contentsOf: imageUrl) else { return nil }
+        return imageData
     }
 }
 
