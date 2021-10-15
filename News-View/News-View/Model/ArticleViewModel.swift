@@ -14,4 +14,5 @@ struct ArticleViewModel {
     let description: String
     let image: UIImage
     let publishedAt: String
+    let isLiked: Bool
 }

@@ -7,10 +7,12 @@
 
 import Foundation
 
-protocol NewsDataInteractor: AnyObject {
+protocol NewsInteractorProtocol: AnyObject {
     func refresh()
     func loadNews()
     func didStart()
     func filterSearch(searchText: String)
     func didTapCancelSearch()
+    func likeOrUnlikeArticle(index: Int, isLiked: Bool)
 }
+

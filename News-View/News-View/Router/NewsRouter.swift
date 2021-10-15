@@ -8,11 +8,10 @@
 import Foundation
 import UIKit
 
-class NewsRouter {
-    
+class NewsRouter: NewsRouterProtocol {
     func makeViewController() -> ViewController {
         let viewController = ViewController(style: .plain)
-        let interactor = NewsInteractor(newsView: viewController)
+        let interactor = NewsInteractor(newsView: viewController, networkService: NetworkDataFetcher())
         interactor.didStart()
         return viewController
     }

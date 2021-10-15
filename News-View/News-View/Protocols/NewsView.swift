@@ -11,7 +11,7 @@ protocol NewsView {
     func configure(newsModels: [ArticleViewModel])
     func reloadData()
     func resetModel()
-    func startAnimation(isHidden: Bool)
+    func startAnimation(isSearchBarHidden: Bool)
     func stopAnimation()
-    func setDelegate(interactor: NewsDataInteractor)
+    func setDelegate(interactor: NewsInteractorProtocol)
 }

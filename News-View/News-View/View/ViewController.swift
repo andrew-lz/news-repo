@@ -7,13 +7,9 @@
 
 import UIKit
 
-class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
+class ViewController: UITableViewController {
     
-    var lastClick: TimeInterval?
-    
-    var lastIndexPath: IndexPath?
-    
-    private var interactor: NewsDataInteractor?
+    private var interactor: NewsInteractorProtocol?
     
     private var newsModels: [ArticleViewModel] = []
     
@@ -29,56 +25,12 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
         return loadingIndicator
     }()
     
-    func configure(newsModels: [ArticleViewModel]) {
-        self.newsModels = newsModels
-        reloadData()
-    }
-    override init(style: UITableView.Style) {
-        super.init(style: style)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setDelegate(interactor: NewsDataInteractor) {
-        self.interactor = interactor
-    }
-    
-    func resetModel() {
-        newsModels = []
-        reloadData()
-    }
-    
-    func updateTableView() {
-        tableView.beginUpdates()
-        tableView.endUpdates()
-    }
-    
-    func reloadData() {
-        tableView.reloadData()
-    }
-    
-    func startAnimation(isHidden: Bool) {
-        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
-        loadingIndicator.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
-        loadingIndicator.centerYAnchor.constraint(equalTo: view.layoutMarginsGuide.centerYAnchor).isActive = true
-        searchController?.searchBar.isHidden = isHidden
-        loadingIndicator.startAnimating()
-    }
-    
-    func stopAnimation() {
-        loadingIndicator.stopAnimating()
-        searchController?.searchBar.isHidden = false
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(loadingIndicator)
         setupRefreshControl()
-        tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: CustomTableViewCell.identifier)
+        tableView.register(ArticleTableViewCell.self, forCellReuseIdentifier: ArticleTableViewCell.identifier)
         setupSearchBar()
-        //        updateSearchResults(for: searchController)
     }
     
     @objc private func refresh() {
@@ -116,6 +68,48 @@ class ViewController: UITableViewController, NewsView, ViewControllerDelegate {
     }
 }
 
+extension ViewController: NewsView {
+   
+    func configure(newsModels: [ArticleViewModel]) {
+        self.newsModels = newsModels
+        reloadData()
+    }
+    
+    func setDelegate(interactor: NewsInteractorProtocol) {
+        self.interactor = interactor
+    }
+    
+    func resetModel() {
+        newsModels = []
+        reloadData()
+    }
+    
+    func reloadData() {
+        tableView.reloadData()
+    }
+    
+    func startAnimation(isSearchBarHidden: Bool) {
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
+        loadingIndicator.centerYAnchor.constraint(equalTo: view.layoutMarginsGuide.centerYAnchor).isActive = true
+        searchController?.searchBar.isHidden = isSearchBarHidden
+        loadingIndicator.startAnimating()
+    }
+    
+    func stopAnimation() {
+        loadingIndicator.stopAnimating()
+        searchController?.searchBar.isHidden = false
+    }
+}
+
+extension ViewController: ArticleTableViewCellDelegate {
+    
+    func updateTableView() {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+}
+
 extension ViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -123,7 +117,7 @@ extension ViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: CustomTableViewCell.identifier, for: indexPath) as! CustomTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ArticleTableViewCell.identifier, for: indexPath) as! ArticleTableViewCell
         cell.setDelegate(delegate: self)
         cell.configure(with: newsModels[indexPath.row])
         return cell

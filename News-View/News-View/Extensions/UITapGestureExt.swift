@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 extension UITapGestureRecognizer {
-    func didTapAttributedTextInLabel(cell: CustomTableViewCell, label: UILabel, inRange targetRange: NSRange) -> Bool {
+    func didTapAttributedTextInLabel(cell: ArticleTableViewCell, label: UILabel, inRange targetRange: NSRange) -> Bool {
         guard let attrString = label.attributedText else {
             return false
         }

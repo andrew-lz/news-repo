@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol ViewControllerDelegate: AnyObject {
+protocol ArticleTableViewCellDelegate: AnyObject {
     func updateTableView()
 }
