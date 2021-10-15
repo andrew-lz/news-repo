@@ -9,21 +9,17 @@ import Foundation
 import UIKit
 
 class NewsInteractor: NewsInteractorProtocol {
-    
     private let newsView: NewsView
     private let networkDataFetcher: NetworkProtocol
     private var dayNumber: Int = 1
     private let daysQuantityBeforeRefresh = 8
     private var articles: [Article] = []
-    
     private var filterStartTimer: Timer?
-    
     required init(newsView: NewsView, networkService: NetworkProtocol) {
         self.newsView = newsView
         self.networkDataFetcher = networkService
         newsView.setDelegate(interactor: self)
     }
-    
     func loadNews() {
         newsView.startAnimation(isSearchBarHidden: false)
         networkDataFetcher.loadNewsPage(before: dayNumber, then: { articles in
@@ -33,7 +29,6 @@ class NewsInteractor: NewsInteractorProtocol {
         })
         dayNumber += 1
     }
-    
     private func filteredArticles(searchText: String) -> [Article] {
         return articles.filter({ (article: Article) -> Bool in
             if let articleTitle = article.title {
@@ -45,11 +40,9 @@ class NewsInteractor: NewsInteractorProtocol {
         }
         )
     }
-    
     func filterSearch(searchText: String) {
         guard !searchText.isEmpty else { return }
         newsView.startAnimation(isSearchBarHidden: false)
-        
         if filterStartTimer == nil {
             filterStartTimer = makeFilterTimer(for: searchText)
         } else {
@@ -58,22 +51,21 @@ class NewsInteractor: NewsInteractorProtocol {
             filterStartTimer = makeFilterTimer(for: searchText)
         }
     }
-    
     private func makeFilterTimer(for searchText: String) -> Timer {
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
             DispatchQueue.main.async {
-                self.newsView.configure(newsModels: self.createNewsModels(articles: self.filteredArticles(searchText: searchText)))
+                self.newsView.configure(newsModels:
+                                            self.createNewsModels(articles:
+                                                                    self.filteredArticles(searchText: searchText)))
                 self.newsView.stopAnimation()
                 self.filterStartTimer = nil
             }
         }
         return timer
     }
-    
     func didTapCancelSearch() {
         newsView.configure(newsModels: createNewsModels(articles: articles))
     }
-    
     private func createNewsModels(articles: [Article]) -> [ArticleViewModel] {
         let newsModels = articles.map { article -> ArticleViewModel in
             let image = networkDataFetcher
@@ -87,21 +79,16 @@ class NewsInteractor: NewsInteractorProtocol {
         }
         return newsModels
     }
-    
-    // TODO: NR-3 add logic
     func likeOrUnlikeArticle(index: Int, isLiked: Bool) {}
-    
     func refresh() {
         newsView.resetModel()
         resetDaysQuantity()
         loadNews()
     }
-    
     func didStart() {
         print("Did start")
         loadNews()
     }
-    
     private func resetDaysQuantity() {
         dayNumber = 1
     }

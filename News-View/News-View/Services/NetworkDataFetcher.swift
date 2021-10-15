@@ -8,13 +8,12 @@
 import Foundation
 
 class NetworkDataFetcher: NetworkProtocol {
-    
     private let networkService = NetworkService()
     private let apiKey =
-        "19aca4fda67d47f3b866f0ee8028f6fd"
+//        "19aca4fda67d47f3b866f0ee8028f6fd"
     //        "220fba25b6d14383908e89872d1136da"
     //           "f1aa354959d04f21b021d83392ce310a"
-    
+        "f2062fdd2a114b7bb1134fe2609bbe37"
     private func fetchNews(urlString: String, response: @escaping (NewsResponse?) -> Void) {
         networkService.request(urlString: urlString) { (result) in
             switch result {
@@ -31,32 +30,27 @@ class NetworkDataFetcher: NetworkProtocol {
             }
         }
     }
-    
     private func formUrl(before daysQuantity: Int) -> String {
         let language = "en"
-        let q = "bitcoin"
+        let keyWord = "bitcoin"
         let pageSize = "10"
         let scheme = "https"
         let host = "newsapi.org"
         let path = "/v2/everything"
-        
         let queryParams: [String: String] = [
             "apiKey": apiKey,
             "language": language,
-            "q": q,
+            "q": keyWord,
             "pageSize": pageSize,
             "page": String(daysQuantity)
         ]
-        
         var urlComponents = URLComponents()
         urlComponents.scheme = scheme
         urlComponents.host = host
         urlComponents.path = path
-        
         urlComponents.setQueryItems(with: queryParams)
         return urlComponents.url!.absoluteString
     }
-    
     func loadNewsPage(before daysQuantity: Int, then handler: @escaping ([Article]) -> Void) {
         let url: String = formUrl(before: daysQuantity)
         fetchNews(urlString: url) { news in
@@ -64,16 +58,15 @@ class NetworkDataFetcher: NetworkProtocol {
             handler(news.articles)
         }
     }
-    
     func loadImageFromUrl(stringUrl: String?) -> Data? {
-        guard let imageUrl: URL  = URL(string: stringUrl ?? "https://s2.coinmarketcap.com/static/img/coins/200x200/1.png"),
+        guard let imageUrl: URL  = URL(string:
+                                        stringUrl ?? "https://s2.coinmarketcap.com/static/img/coins/200x200/1.png"),
               let imageData = try? Data(contentsOf: imageUrl) else { return nil }
         return imageData
     }
 }
 
 private class NetworkService {
-    
     func request(urlString: String, completion: @escaping (Result<Data, Error>) -> Void) {
         guard let url = URL(string: urlString) else { return }
         URLSession.shared.dataTask(with: url) { (data, _, error) in
@@ -91,10 +84,7 @@ private class NetworkService {
 }
 
 extension URLComponents {
-    
     mutating func setQueryItems(with parameters: [String: String]) {
         self.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
     }
 }
-
-
