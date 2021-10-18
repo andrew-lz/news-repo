@@ -11,7 +11,7 @@ import UIKit
 class NewsInteractor: NewsInteractorProtocol {
     private let newsView: NewsView
     private let networkDataFetcher: NetworkProtocol
-    private var dayNumber: Int = 1
+    private var pageNumber: Int = 1
     private let daysQuantityBeforeRefresh = 8
     private var articles: [Article] = []
     private var filterStartTimer: Timer?
@@ -21,13 +21,15 @@ class NewsInteractor: NewsInteractorProtocol {
         newsView.setDelegate(interactor: self)
     }
     func loadNews() {
-        newsView.startAnimation(isSearchBarHidden: false)
-        networkDataFetcher.loadNewsPage(before: dayNumber, then: { articles in
+        print("Load news")
+        networkDataFetcher.loadNewsPage(before: self.pageNumber, then: { articles in
             self.articles.append(contentsOf: articles)
-            self.newsView.configure(newsModels: self.createNewsModels(articles: self.articles))
+            DispatchQueue.main.async {
+                self.newsView.configure(newsModels: self.createNewsModels(articles: self.articles))
+            }
             self.newsView.stopAnimation()
         })
-        dayNumber += 1
+        pageNumber += 1
     }
     private func filteredArticles(searchText: String) -> [Article] {
         return articles.filter({ (article: Article) -> Bool in
@@ -82,14 +84,15 @@ class NewsInteractor: NewsInteractorProtocol {
     func likeOrUnlikeArticle(index: Int, isLiked: Bool) {}
     func refresh() {
         newsView.resetModel()
-        resetDaysQuantity()
+        resetPagesQuantity()
         loadNews()
     }
     func didStart() {
         print("Did start")
+        newsView.startAnimation(isSearchBarHidden: true)
         loadNews()
     }
-    private func resetDaysQuantity() {
-        dayNumber = 1
+    private func resetPagesQuantity() {
+        pageNumber = 1
     }
 }

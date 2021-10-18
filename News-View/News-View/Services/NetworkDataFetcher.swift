@@ -12,8 +12,8 @@ class NetworkDataFetcher: NetworkProtocol {
     private let apiKey =
 //        "19aca4fda67d47f3b866f0ee8028f6fd"
     //        "220fba25b6d14383908e89872d1136da"
-    //           "f1aa354959d04f21b021d83392ce310a"
-        "f2062fdd2a114b7bb1134fe2609bbe37"
+               "f1aa354959d04f21b021d83392ce310a"
+//        "f2062fdd2a114b7bb1134fe2609bbe37"
     private func fetchNews(urlString: String, response: @escaping (NewsResponse?) -> Void) {
         networkService.request(urlString: urlString) { (result) in
             switch result {

@@ -54,25 +54,25 @@ class ArticleTableViewCell: UITableViewCell {
         content.isUserInteractionEnabled = true
         return content
     }()
-    private let favourite: UILabel = {
-        let favourite = UILabel()
-        favourite.text = "🤍"
-        favourite.sizeToFit()
-        favourite.translatesAutoresizingMaskIntoConstraints = false
-        favourite.isUserInteractionEnabled = true
-        return favourite
+    private let likeLabel: UILabel = {
+        var like = UILabel()
+        like.translatesAutoresizingMaskIntoConstraints = false
+        like.sizeToFit()
+        like.text = "❤️"
+        like.font = like.font.withSize(70)
+        like.textAlignment = .center
+        like.isHidden = true
+        return like
     }()
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
         content.addGestureRecognizer(tapGesture)
-        let subviews = [favourite, title, author, publishedAt, newsImageView, content]
+        let subviews = [title, author, publishedAt, newsImageView, likeLabel, content]
         for subview in subviews {
-        contentView.addSubview(subview)
+            contentView.addSubview(subview)
         }
         NSLayoutConstraint.activate([
-            favourite.topAnchor.constraint(equalTo: contentView.topAnchor),
-            favourite.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             title.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             title.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             title.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -87,6 +87,8 @@ class ArticleTableViewCell: UITableViewCell {
             newsImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             newsImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             newsImageView.heightAnchor.constraint(equalToConstant: 300),
+            likeLabel.centerXAnchor.constraint(equalTo: newsImageView.centerXAnchor),
+            likeLabel.centerYAnchor.constraint(equalTo: newsImageView.centerYAnchor),
             content.topAnchor.constraint(equalTo: newsImageView.bottomAnchor),
             content.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             content.rightAnchor.constraint(equalTo: contentView.rightAnchor),
@@ -98,13 +100,6 @@ class ArticleTableViewCell: UITableViewCell {
     }
     func setDelegate(delegate: ArticleTableViewCellDelegate) {
         self.delegate = delegate
-    }
-    func addToFavourites() {
-        if favourite.text == "❤️" {
-            favourite.text = "🤍"
-        } else {
-            favourite.text = "❤️"
-        }
     }
     @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
         guard let text = content.text else { return }
@@ -136,5 +131,11 @@ class ArticleTableViewCell: UITableViewCell {
                                attributes: myAttribute)
         newsImageView.image = newsModel.image
         configureContent(newsDescription: newsModel.description)
+    }
+    func didTapOnCell() {
+        likeLabel.isHidden = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.likeLabel.isHidden = true
+        }
     }
 }
