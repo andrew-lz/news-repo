@@ -15,4 +15,3 @@ protocol NewsInteractorProtocol: AnyObject {
     func didTapCancelSearch()
     func likeOrUnlikeArticle(index: Int, isLiked: Bool)
 }
-
