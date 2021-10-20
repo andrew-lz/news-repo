@@ -21,13 +21,11 @@ class NewsInteractor: NewsInteractorProtocol {
         newsView.setDelegate(interactor: self)
     }
     func loadNews() {
-        print("Load news")
         networkDataFetcher.loadNewsPage(before: self.pageNumber, then: { articles in
             self.articles.append(contentsOf: articles)
             DispatchQueue.main.async {
                 self.newsView.configure(newsModels: self.createNewsModels(articles: self.articles))
             }
-            self.newsView.stopAnimation()
         })
         pageNumber += 1
     }
@@ -91,6 +89,9 @@ class NewsInteractor: NewsInteractorProtocol {
         print("Did start")
         newsView.startAnimation(isSearchBarHidden: true)
         loadNews()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.newsView.stopAnimation()
+        }
     }
     private func resetPagesQuantity() {
         pageNumber = 1

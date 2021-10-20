@@ -44,8 +44,11 @@ class ViewController: UIViewController {
             tableView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
     }
+    private func isSearchBarHidden(isHidden: Bool) {
+        searchController?.searchBar.isHidden = isHidden
+    }
     private func setupLoadingSpinner() {
-         loadingSpinner = UIActivityIndicatorView(style: .medium)
+        loadingSpinner = UIActivityIndicatorView(style: .medium)
         loadingSpinner?.color = .red
         loadingSpinner?.startAnimating()
         loadingSpinner?.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
@@ -54,13 +57,16 @@ class ViewController: UIViewController {
     }
     @objc private func refresh() {
         interactor?.refresh()
-        searchController?.searchBar.isHidden = true
+        isSearchBarHidden(isHidden: true)
         searchController?.isActive = false
         setupLoadingSpinner()
         refreshControl.endRefreshing()
     }
     private func setupRefreshControl() {
         refreshControl = UIRefreshControl()
+        let myAttributes = [NSAttributedString.Key.font: UIFont(name: "Chalkduster", size: 30) as Any]
+        refreshControl.attributedTitle = NSAttributedString(string: "Refresh",
+                                                            attributes: myAttributes)
         refreshControl.tintColor = .clear
         refreshControl.backgroundColor = .black
         refreshControl.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
@@ -75,8 +81,6 @@ class ViewController: UIViewController {
     }
     private func setupNavigationBar() {
         navigationItem.searchController = searchController
-        navigationItem.leftBarButtonItem = createSortButton()
-        navigationItem.leftBarButtonItem?.tintColor = .white
     }
     @objc private func filter() {
         guard let searchText = searchController?.searchBar.text else { return }
@@ -92,6 +96,7 @@ class ViewController: UIViewController {
 extension ViewController: NewsView {
     func configure(newsModels: [ArticleViewModel]) {
         self.newsModels = newsModels
+        isSearchBarHidden(isHidden: false)
         reloadData()
     }
     func setDelegate(interactor: NewsInteractorProtocol) {
@@ -108,12 +113,12 @@ extension ViewController: NewsView {
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
         loadingIndicator.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
         loadingIndicator.centerYAnchor.constraint(equalTo: view.layoutMarginsGuide.centerYAnchor).isActive = true
-        searchController?.searchBar.isHidden = isSearchBarHidden
+        self.isSearchBarHidden(isHidden: isSearchBarHidden)
         loadingIndicator.startAnimating()
     }
     func stopAnimation() {
         loadingIndicator.stopAnimating()
-        searchController?.searchBar.isHidden = false
+        isSearchBarHidden(isHidden: false)
     }
 }
 
@@ -142,13 +147,11 @@ extension ViewController: UITableViewDelegate {
         return UITableView.automaticDimension
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let cell = tableView.cellForRow(at: indexPath) as? ArticleTableViewCell else { return }
-        cell.didTapOnCell()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if (scrollView.contentSize.height - scrollView.frame.size.height - scrollView.contentOffset.y) <= 20,
-           newsModels.count != 0 {
+           newsModels.count != 0, searchController?.isActive == false {
             setupLoadingSpinner()
             interactor?.loadNews()
         }
@@ -161,27 +164,5 @@ extension ViewController: UISearchBarDelegate {
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         interactor?.filterSearch(searchText: searchBar.text ?? "")
-    }
-}
-
-extension ViewController {
-    func createSortButton() -> UIBarButtonItem {
-        return UIBarButtonItem(title: "Sort", style: .done, target: self, action: #selector(showSimpleAlert(_:)))
-    }
-    @objc private func showSimpleAlert(_ sender: UIBarButtonItem) {
-        let alert = UIAlertController(title: "By", message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Author", style: .default, handler: { _ in
-            self.navigationItem.leftBarButtonItem?.title = "Sorted by author"
-        }))
-        alert.addAction(UIAlertAction(title: "Date", style: .default, handler: { _ in
-            self.navigationItem.leftBarButtonItem?.title = "Sorted by date"
-        }))
-        alert.addAction(UIAlertAction(title: "Favourites", style: .default, handler: { _ in
-            self.navigationItem.leftBarButtonItem?.title = "Sorted by favourites"
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
-            self.navigationItem.leftBarButtonItem?.title = "Sort"
-        }))
-        self.present(alert, animated: true, completion: nil)
     }
 }

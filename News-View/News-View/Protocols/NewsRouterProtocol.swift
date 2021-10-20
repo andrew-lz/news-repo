@@ -8,5 +8,5 @@
 import UIKit
 
 protocol NewsRouterProtocol {
-    func makeNewsNavigationController() -> UINavigationController
+    func makeNewsController() -> UINavigationController
 }
