@@ -59,43 +59,55 @@ class ArticleTableViewCell: UITableViewCell {
         like.isHidden = true
         return like
     }()
-    private lazy var stackView: UIStackView = {
+    private let stackView: UIStackView = {
         let stack = UIStackView()
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.isUserInteractionEnabled = true
         stack.axis = .vertical
-        [self.title,
-         self.author,
-         self.publishedAt,
-         self.newsImageView,
-         self.content
-        ].forEach { stack.addArrangedSubview($0)}
         return stack
     }()
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        let tapReadmoreGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
-        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapOnCell(_:)))
-        likeTapGesture.numberOfTapsRequired = 2
-        tapReadmoreGesture.cancelsTouchesInView = false
-        addGestureRecognizer(tapReadmoreGesture)
-        addGestureRecognizer(likeTapGesture)
-        addSubview(stackView)
-        addSubview(likeLabel)
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: topAnchor),
-            stackView.leftAnchor.constraint(equalTo: leftAnchor),
-            stackView.rightAnchor.constraint(equalTo: rightAnchor),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            likeLabel.centerXAnchor.constraint(equalTo: newsImageView.centerXAnchor),
-            likeLabel.centerYAnchor.constraint(equalTo: newsImageView.centerYAnchor)
-        ])
+        addReadmoreGestureRecognizer()
+        addLikeGestureRecognizer()
+        setupStackView()
+        setupLikeLabel()
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     func setDelegate(delegate: ArticleTableViewCellDelegate) {
         self.delegate = delegate
+    }
+    private func setupStackView() {
+        let stackSubviews = [title, author, publishedAt, newsImageView, content]
+        stackSubviews.forEach { stackSubview in
+            stackView.addArrangedSubview(stackSubview)
+            addSubview(stackView)
+            NSLayoutConstraint.activate([
+                stackView.topAnchor.constraint(equalTo: topAnchor),
+                stackView.leftAnchor.constraint(equalTo: leftAnchor),
+                stackView.rightAnchor.constraint(equalTo: rightAnchor),
+                stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
+        }
+    }
+    private func addReadmoreGestureRecognizer() {
+        let tapReadmoreGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
+        tapReadmoreGesture.cancelsTouchesInView = false
+        addGestureRecognizer(tapReadmoreGesture)
+    }
+    private func addLikeGestureRecognizer() {
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapOnCell(_:)))
+        likeTapGesture.numberOfTapsRequired = 2
+        addGestureRecognizer(likeTapGesture)
+    }
+    private func setupLikeLabel() {
+        addSubview(likeLabel)
+        NSLayoutConstraint.activate([
+            likeLabel.centerXAnchor.constraint(equalTo: newsImageView.centerXAnchor),
+            likeLabel.centerYAnchor.constraint(equalTo: newsImageView.centerYAnchor)
+        ])
     }
     @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
         guard let text = content.text else { return }
