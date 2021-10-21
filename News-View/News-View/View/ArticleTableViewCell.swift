@@ -18,28 +18,25 @@ class ArticleTableViewCell: UITableViewCell {
         let title = UILabel()
         title.textColor = .orange
         title.numberOfLines = 0
-        title.translatesAutoresizingMaskIntoConstraints = false
         return title
     }()
     private let author: UILabel = {
         let author = UILabel()
         author.textColor = .cyan
         author.numberOfLines = 0
-        author.translatesAutoresizingMaskIntoConstraints = false
         return author
     }()
     private let publishedAt: UILabel = {
         let publishedAt = UILabel()
         publishedAt.textColor = .magenta
         publishedAt.numberOfLines = 0
-        publishedAt.translatesAutoresizingMaskIntoConstraints = false
         return publishedAt
     }()
     private let newsImageView: UIImageView = {
         let newsImageView = UIImageView()
         newsImageView.backgroundColor = .darkGray
         newsImageView.contentMode = .scaleAspectFill
-        newsImageView.translatesAutoresizingMaskIntoConstraints = false
+        newsImageView.heightAnchor.constraint(equalToConstant: 300).isActive = true
         newsImageView.layer.cornerRadius = 30
         newsImageView.clipsToBounds = true
         return newsImageView
@@ -50,48 +47,31 @@ class ArticleTableViewCell: UITableViewCell {
         content.sizeToFit()
         content.numberOfLines = 4
         content.lineBreakMode = .byWordWrapping
-        content.translatesAutoresizingMaskIntoConstraints = false
         content.isUserInteractionEnabled = true
         return content
     }()
-    private let favourite: UILabel = {
-        let favourite = UILabel()
-        favourite.text = "🤍"
-        favourite.sizeToFit()
-        favourite.translatesAutoresizingMaskIntoConstraints = false
-        favourite.isUserInteractionEnabled = true
-        return favourite
+    private let likeLabel: UILabel = {
+        var like = UILabel()
+        like.translatesAutoresizingMaskIntoConstraints = false
+        like.text = "❤️"
+        like.font = like.font.withSize(70)
+        like.textAlignment = .center
+        like.isHidden = true
+        return like
+    }()
+    private let stackView: UIStackView = {
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.isUserInteractionEnabled = true
+        stack.axis = .vertical
+        return stack
     }()
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
-        content.addGestureRecognizer(tapGesture)
-        let subviews = [favourite, title, author, publishedAt, newsImageView, content]
-        for subview in subviews {
-        contentView.addSubview(subview)
-        }
-        NSLayoutConstraint.activate([
-            favourite.topAnchor.constraint(equalTo: contentView.topAnchor),
-            favourite.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            title.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            title.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            title.topAnchor.constraint(equalTo: contentView.topAnchor),
-            author.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            author.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            author.topAnchor.constraint(equalTo: title.bottomAnchor),
-            publishedAt.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            publishedAt.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            publishedAt.topAnchor.constraint(equalTo: author.bottomAnchor),
-            newsImageView.topAnchor.constraint(equalTo: publishedAt.bottomAnchor),
-            newsImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            newsImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            newsImageView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            newsImageView.heightAnchor.constraint(equalToConstant: 300),
-            content.topAnchor.constraint(equalTo: newsImageView.bottomAnchor),
-            content.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            content.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            content.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        ])
+        addReadmoreGestureRecognizer()
+        addLikeGestureRecognizer()
+        setupStackView()
+        setupLikeLabel()
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -99,12 +79,35 @@ class ArticleTableViewCell: UITableViewCell {
     func setDelegate(delegate: ArticleTableViewCellDelegate) {
         self.delegate = delegate
     }
-    func addToFavourites() {
-        if favourite.text == "❤️" {
-            favourite.text = "🤍"
-        } else {
-            favourite.text = "❤️"
+    private func setupStackView() {
+        let stackSubviews = [title, author, publishedAt, newsImageView, content]
+        stackSubviews.forEach { stackSubview in
+            stackView.addArrangedSubview(stackSubview)
+            addSubview(stackView)
+            NSLayoutConstraint.activate([
+                stackView.topAnchor.constraint(equalTo: topAnchor),
+                stackView.leftAnchor.constraint(equalTo: leftAnchor),
+                stackView.rightAnchor.constraint(equalTo: rightAnchor),
+                stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
         }
+    }
+    private func addReadmoreGestureRecognizer() {
+        let tapReadmoreGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
+        tapReadmoreGesture.cancelsTouchesInView = false
+        addGestureRecognizer(tapReadmoreGesture)
+    }
+    private func addLikeGestureRecognizer() {
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapOnCell(_:)))
+        likeTapGesture.numberOfTapsRequired = 2
+        addGestureRecognizer(likeTapGesture)
+    }
+    private func setupLikeLabel() {
+        addSubview(likeLabel)
+        NSLayoutConstraint.activate([
+            likeLabel.centerXAnchor.constraint(equalTo: newsImageView.centerXAnchor),
+            likeLabel.centerYAnchor.constraint(equalTo: newsImageView.centerYAnchor)
+        ])
     }
     @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
         guard let text = content.text else { return }
@@ -136,5 +139,14 @@ class ArticleTableViewCell: UITableViewCell {
                                attributes: myAttribute)
         newsImageView.image = newsModel.image
         configureContent(newsDescription: newsModel.description)
+    }
+    @objc private func didTapOnCell(_ gesture: UITapGestureRecognizer) {
+        likeLabel.isHidden = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.likeLabel.isHidden = true
+        }
+    }
+    override func prepareForReuse() {
+        likeLabel.isHidden = true
     }
 }

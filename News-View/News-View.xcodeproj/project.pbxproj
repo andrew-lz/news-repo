@@ -24,6 +24,7 @@
 		E3743E472717112B001DECA2 /* PersistenceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3743E462717112B001DECA2 /* PersistenceProtocol.swift */; };
 		E3A8517B2716F8BB0088B90E /* NetworkProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A8517A2716F8BB0088B90E /* NetworkProtocol.swift */; };
 		E3A8517F2716FD160088B90E /* NewsRouterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A8517E2716FD160088B90E /* NewsRouterProtocol.swift */; };
+		E3BC1EBD271D71E500F48D43 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E3BC1EBC271D71E500F48D43 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		E3743E462717112B001DECA2 /* PersistenceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceProtocol.swift; sourceTree = "<group>"; };
 		E3A8517A2716F8BB0088B90E /* NetworkProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtocol.swift; sourceTree = "<group>"; };
 		E3A8517E2716FD160088B90E /* NewsRouterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRouterProtocol.swift; sourceTree = "<group>"; };
+		E3BC1EBC271D71E500F48D43 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ../../../../../Downloads/LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -141,6 +143,7 @@
 				63F974EF26E8D6FF00C207C7 /* Extensions */,
 				639CB2DA26E004D700EE0A6E /* Info.plist */,
 				639CB2D526E004D700EE0A6E /* Assets.xcassets */,
+				E3BC1EBC271D71E500F48D43 /* LaunchScreen.storyboard */,
 			);
 			path = "News-View";
 			sourceTree = "<group>";
@@ -220,6 +223,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				639CB2D626E004D700EE0A6E /* Assets.xcassets in Resources */,
+				E3BC1EBD271D71E500F48D43 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

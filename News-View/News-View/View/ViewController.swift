@@ -7,10 +7,13 @@
 
 import UIKit
 
-class ViewController: UITableViewController {
+class ViewController: UIViewController {
+    private let tableView = UITableView()
     private var interactor: NewsInteractorProtocol?
     private var newsModels: [ArticleViewModel] = []
     private var searchController: UISearchController?
+    private var refreshControl = UIRefreshControl()
+    private var loadingSpinner: UIActivityIndicatorView?
     private let loadingIndicator: UIActivityIndicatorView = {
         let loadingIndicator = UIActivityIndicatorView()
         loadingIndicator.color = .purple
@@ -22,21 +25,52 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(loadingIndicator)
-        setupRefreshControl()
-        tableView.register(ArticleTableViewCell.self, forCellReuseIdentifier: ArticleTableViewCell.identifier)
         setupSearchBar()
+        setupRefreshControl()
+        setupNavigationBar()
+        setupTableView()
+    }
+    private func setupTableView() {
+        tableView.register(ArticleTableViewCell.self, forCellReuseIdentifier: ArticleTableViewCell.identifier)
+        view.addSubview(tableView)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .clear
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor)
+        ])
+    }
+    private func isSearchBarHidden(isHidden: Bool) {
+        searchController?.searchBar.isHidden = isHidden
+    }
+    private func setupLoadingSpinner() {
+        loadingSpinner = UIActivityIndicatorView(style: .medium)
+        loadingSpinner?.color = .red
+        loadingSpinner?.startAnimating()
+        loadingSpinner?.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+        self.tableView.tableFooterView = loadingSpinner
+        self.tableView.tableFooterView?.isHidden = false
     }
     @objc private func refresh() {
         interactor?.refresh()
-        searchController?.searchBar.isHidden = true
+        isSearchBarHidden(isHidden: true)
         searchController?.isActive = false
-        refreshControl?.endRefreshing()
+        setupLoadingSpinner()
+        refreshControl.endRefreshing()
     }
     private func setupRefreshControl() {
         refreshControl = UIRefreshControl()
-        refreshControl?.tintColor = .clear
-        refreshControl?.backgroundColor = .black
-        refreshControl!.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        let myAttributes = [NSAttributedString.Key.font: UIFont(name: "Chalkduster", size: 30) as Any]
+        refreshControl.attributedTitle = NSAttributedString(string: "Refresh",
+                                                            attributes: myAttributes)
+        refreshControl.tintColor = .clear
+        refreshControl.backgroundColor = .black
+        refreshControl.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
     private func setupSearchBar() {
         searchController = UISearchController(searchResultsController: nil)
@@ -44,7 +78,9 @@ class ViewController: UITableViewController {
         searchController?.searchBar.placeholder = "Search by Title"
         searchController?.searchBar.tintColor = .cyan
         searchController?.searchBar.delegate = self
-        tableView.tableHeaderView = searchController?.searchBar
+    }
+    private func setupNavigationBar() {
+        navigationItem.searchController = searchController
     }
     @objc private func filter() {
         guard let searchText = searchController?.searchBar.text else { return }
@@ -60,6 +96,7 @@ class ViewController: UITableViewController {
 extension ViewController: NewsView {
     func configure(newsModels: [ArticleViewModel]) {
         self.newsModels = newsModels
+        isSearchBarHidden(isHidden: false)
         reloadData()
     }
     func setDelegate(interactor: NewsInteractorProtocol) {
@@ -76,12 +113,12 @@ extension ViewController: NewsView {
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
         loadingIndicator.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
         loadingIndicator.centerYAnchor.constraint(equalTo: view.layoutMarginsGuide.centerYAnchor).isActive = true
-        searchController?.searchBar.isHidden = isSearchBarHidden
+        self.isSearchBarHidden(isHidden: isSearchBarHidden)
         loadingIndicator.startAnimating()
     }
     func stopAnimation() {
         loadingIndicator.stopAnimating()
-        searchController?.searchBar.isHidden = false
+        isSearchBarHidden(isHidden: false)
     }
 }
 
@@ -92,25 +129,31 @@ extension ViewController: ArticleTableViewCellDelegate {
     }
 }
 
-extension ViewController {
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension ViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return newsModels.count
     }
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ArticleTableViewCell.identifier,
                                                  for: indexPath) as? ArticleTableViewCell
         cell?.setDelegate(delegate: self)
         cell?.configure(with: newsModels[indexPath.row])
         return cell ?? ArticleTableViewCell()
     }
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+}
+
+extension ViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if tableView.contentSize.height - tableView.frame.height < tableView.contentOffset.y {
-            if searchController?.isActive == false {
-                interactor?.loadNews()
-            }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if (scrollView.contentSize.height - scrollView.frame.size.height - scrollView.contentOffset.y) <= 20,
+           newsModels.count != 0, searchController?.isActive == false {
+            setupLoadingSpinner()
+            interactor?.loadNews()
         }
     }
 }
