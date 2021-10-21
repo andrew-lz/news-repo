@@ -146,4 +146,7 @@ class ArticleTableViewCell: UITableViewCell {
             self.likeLabel.isHidden = true
         }
     }
+    override func prepareForReuse() {
+        likeLabel.isHidden = true
+    }
 }
