@@ -11,9 +11,17 @@ class NetworkDataFetcher: NetworkProtocol {
     
     private let networkService = NetworkService()
     private let apiKey =
-        "19aca4fda67d47f3b866f0ee8028f6fd"
-    //        "220fba25b6d14383908e89872d1136da"
-    //           "f1aa354959d04f21b021d83392ce310a"
+//        "19aca4fda67d47f3b866f0ee8028f6fd"
+//            "220fba25b6d14383908e89872d1136da"
+//               "f1aa354959d04f21b021d83392ce310a"
+//    "828cdc6e609545239d8d695f3660d6d1"
+//        "e0ffbfae416e485eae49dfba99b2ac24"
+        "f2062fdd2a114b7bb1134fe2609bbe37"
+    private let topic: String
+
+    init(topic: String) {
+        self.topic = topic
+    }
     
     private func fetchNews(urlString: String, response: @escaping (NewsResponse?) -> Void) {
         networkService.request(urlString: urlString) { (result) in
@@ -32,10 +40,10 @@ class NetworkDataFetcher: NetworkProtocol {
         }
     }
     
-    private func formUrl(before daysQuantity: Int) -> String {
+    private func formUrl(before pageNumber: Int) -> String {
         let language = "en"
-        let q = "bitcoin"
-        let pageSize = "10"
+        let q = topic
+        let pageSize = "50"
         let scheme = "https"
         let host = "newsapi.org"
         let path = "/v2/everything"
@@ -45,7 +53,7 @@ class NetworkDataFetcher: NetworkProtocol {
             "language": language,
             "q": q,
             "pageSize": pageSize,
-            "page": String(daysQuantity)
+            "page": String(pageNumber)
         ]
         
         var urlComponents = URLComponents()
@@ -54,6 +62,7 @@ class NetworkDataFetcher: NetworkProtocol {
         urlComponents.path = path
         
         urlComponents.setQueryItems(with: queryParams)
+        print(urlComponents.url!.absoluteString)
         return urlComponents.url!.absoluteString
     }
     
@@ -66,7 +75,7 @@ class NetworkDataFetcher: NetworkProtocol {
     }
     
     func loadImageFromUrl(stringUrl: String?) -> Data? {
-        guard let imageUrl: URL  = URL(string: stringUrl ?? "https://s2.coinmarketcap.com/static/img/coins/200x200/1.png"),
+        guard let imageUrl: URL  = URL(string: "https://s2.coinmarketcap.com/static/img/coins/200x200/1.png"),
               let imageData = try? Data(contentsOf: imageUrl) else { return nil }
         return imageData
     }

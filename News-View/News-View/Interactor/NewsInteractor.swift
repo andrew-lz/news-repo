@@ -12,11 +12,8 @@ class NewsInteractor: NewsInteractorProtocol {
     
     private let newsView: NewsView
     private let networkDataFetcher: NetworkProtocol
-    private var dayNumber: Int = 1
-    private let daysQuantityBeforeRefresh = 8
+    private var pageNumber: Int = 1
     private var articles: [Article] = []
-    
-    private var filterStartTimer: Timer?
     
     required init(newsView: NewsView, networkService: NetworkProtocol) {
         self.newsView = newsView
@@ -26,22 +23,34 @@ class NewsInteractor: NewsInteractorProtocol {
     
     func loadNews() {
         newsView.startAnimation(isSearchBarHidden: false)
-        networkDataFetcher.loadNewsPage(before: dayNumber, then: { articles in
+        networkDataFetcher.loadNewsPage(before: pageNumber, then: { articles in
             self.articles.append(contentsOf: articles)
             self.newsView.configure(newsModels: self.createNewsModels(articles: self.articles))
             self.newsView.stopAnimation()
         })
-        dayNumber += 1
+        pageNumber += 1
+    }
+    
+    func sortByAuthor() {
+        let emptyValue = "No Author"
+        newsView.configure(newsModels: createNewsModels(articles: articles.sorted {
+            $0.author ?? emptyValue > $1.author ?? emptyValue
+        }))
+    }
+    
+    func sortByPublishingDate() {
+        let emptyValue = "No Date"
+        newsView.configure(newsModels: createNewsModels(articles: articles.sorted {
+            $0.publishedAt ?? emptyValue < $1.publishedAt ?? emptyValue
+        }))
     }
     
     private func filteredArticles(searchText: String) -> [Article] {
         return articles.filter({ (article: Article) -> Bool in
-            if let articleTitle = article.title {
-                let titleMatch = articleTitle.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
-                return titleMatch != nil
-            } else {
-                return "No Title".range(of: searchText, options: NSString.CompareOptions.caseInsensitive) != nil
-            }
+            
+            let articleTitle = article.title ?? "No Title"
+            let titleMatch = articleTitle.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
+            return titleMatch != nil
         }
         )
     }
@@ -49,51 +58,30 @@ class NewsInteractor: NewsInteractorProtocol {
     func filterSearch(searchText: String) {
         guard !searchText.isEmpty else { return }
         newsView.startAnimation(isSearchBarHidden: false)
-        
-        if filterStartTimer == nil {
-            filterStartTimer = makeFilterTimer(for: searchText)
-        } else {
-            filterStartTimer?.invalidate()
-            filterStartTimer = nil
-            filterStartTimer = makeFilterTimer(for: searchText)
+        DispatchQueue.main.async {
+            self.newsView.configure(newsModels: self.createNewsModels(articles: self.filteredArticles(searchText: searchText)))
+            self.newsView.stopAnimation()
         }
-    }
-    
-    private func makeFilterTimer(for searchText: String) -> Timer {
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in
-            DispatchQueue.main.async {
-                self.newsView.configure(newsModels: self.createNewsModels(articles: self.filteredArticles(searchText: searchText)))
-                self.newsView.stopAnimation()
-                self.filterStartTimer = nil
-            }
-        }
-        return timer
     }
     
     func didTapCancelSearch() {
+        resetPageNumber()
         newsView.configure(newsModels: createNewsModels(articles: articles))
     }
     
     private func createNewsModels(articles: [Article]) -> [ArticleViewModel] {
         let newsModels = articles.map { article -> ArticleViewModel in
-            let image = networkDataFetcher
-                .loadImageFromUrl(stringUrl: article.urlToImage)
-                .flatMap { UIImage(data: $0) } ?? UIImage()
             return ArticleViewModel(title: article.title ?? "No Title",
                                     author: article.author,
-                                    description: article.description,
-                                    image: image,
-                                    publishedAt: article.publishedAt, isLiked: false)
+                                    description: article.description ?? "No Description",
+                                    publishedAt: article.publishedAt ?? "No Date")
         }
         return newsModels
     }
     
-    // TODO: NR-3 add logic
-    func likeOrUnlikeArticle(index: Int, isLiked: Bool) {}
-    
     func refresh() {
         newsView.resetModel()
-        resetDaysQuantity()
+        resetPageNumber()
         loadNews()
     }
     
@@ -102,7 +90,7 @@ class NewsInteractor: NewsInteractorProtocol {
         loadNews()
     }
     
-    private func resetDaysQuantity() {
-        dayNumber = 1
+    private func resetPageNumber() {
+        pageNumber = 1
     }
 }

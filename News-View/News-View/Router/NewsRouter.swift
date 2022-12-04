@@ -9,9 +9,9 @@ import Foundation
 import UIKit
 
 class NewsRouter: NewsRouterProtocol {
-    func makeViewController() -> ViewController {
-        let viewController = ViewController(style: .plain)
-        let interactor = NewsInteractor(newsView: viewController, networkService: NetworkDataFetcher())
+    func makeViewController(with topic: String) -> ViewController {
+        let viewController = ViewController()
+        let interactor = NewsInteractor(newsView: viewController, networkService: NetworkDataFetcher(topic: topic))
         interactor.didStart()
         return viewController
     }

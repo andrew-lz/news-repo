@@ -13,6 +13,6 @@ protocol NewsInteractorProtocol: AnyObject {
     func didStart()
     func filterSearch(searchText: String)
     func didTapCancelSearch()
-    func likeOrUnlikeArticle(index: Int, isLiked: Bool)
+    func sortByAuthor()
+    func sortByPublishingDate()
 }
-

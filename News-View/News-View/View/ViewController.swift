@@ -7,13 +7,18 @@
 
 import UIKit
 
-class ViewController: UITableViewController {
+class ViewController: UIViewController {
+    
+    private let tableView = UITableView()
     
     private var interactor: NewsInteractorProtocol?
     
     private var newsModels: [ArticleViewModel] = []
     
     private var searchController: UISearchController?
+    
+    private let refreshControl = UIRefreshControl()
+
     
     private let loadingIndicator: UIActivityIndicatorView = {
         let loadingIndicator = UIActivityIndicatorView()
@@ -28,23 +33,40 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(loadingIndicator)
-        setupRefreshControl()
-        tableView.register(ArticleTableViewCell.self, forCellReuseIdentifier: ArticleTableViewCell.identifier)
         setupSearchBar()
+        setupRefreshControl()
+        setupNavigationBar()
+        setupTableView()
     }
     
     @objc private func refresh() {
         interactor?.refresh()
-        searchController?.searchBar.isHidden = true
-        searchController?.isActive = false
-        refreshControl?.endRefreshing()
+        navigationItem.searchController = nil
+        refreshControl.endRefreshing()
+    }
+    
+    private func setupTableView() {
+        tableView.register(ArticleTableViewCell.self, forCellReuseIdentifier: ArticleTableViewCell.identifier)
+        view.addSubview(tableView)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .clear
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+        ])
     }
     
     private func setupRefreshControl() {
-        refreshControl = UIRefreshControl()
-        refreshControl?.tintColor = .clear
-        refreshControl?.backgroundColor = .black
-        refreshControl!.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        refreshControl.tintColor = .clear
+        refreshControl.backgroundColor = .black
+        refreshControl.largeContentTitle = "Refreshing"
+        refreshControl.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        tableView.addSubview(refreshControl)
+        tableView.alwaysBounceVertical = true
     }
     
     private func setupSearchBar() {
@@ -52,8 +74,18 @@ class ViewController: UITableViewController {
         searchController?.obscuresBackgroundDuringPresentation = false
         searchController?.searchBar.placeholder = "Search by Title"
         searchController?.searchBar.tintColor = .cyan
+        searchController?.searchBar.searchTextField.textColor = .white
         searchController?.searchBar.delegate = self
-        tableView.tableHeaderView = searchController?.searchBar
+//        searchController?.searchBar.showsSearchResultsButton = true
+        searchController?.searchBar.showsCancelButton = true
+    }
+    
+    private func setupNavigationBar() {
+//        navigationItem.searchController = searchController
+//        navigationItem.searchController?.isActive = false
+        navigationItem.leftBarButtonItem = createSortButton()
+        navigationItem.rightBarButtonItem = createSearchButton()
+        navigationController?.navigationBar.barTintColor = .white
     }
     
     @objc private func filter() {
@@ -69,7 +101,7 @@ class ViewController: UITableViewController {
 }
 
 extension ViewController: NewsView {
-   
+    
     func configure(newsModels: [ArticleViewModel]) {
         self.newsModels = newsModels
         reloadData()
@@ -110,28 +142,33 @@ extension ViewController: ArticleTableViewCellDelegate {
     }
 }
 
-extension ViewController {
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension ViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return newsModels.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ArticleTableViewCell.identifier, for: indexPath) as! ArticleTableViewCell
         cell.setDelegate(delegate: self)
         cell.configure(with: newsModels[indexPath.row])
         return cell
     }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+}
+
+extension ViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
     
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if tableView.contentSize.height - tableView.frame.height < tableView.contentOffset.y {
-            if searchController?.isActive == false {
-                interactor?.loadNews()
-            }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? ArticleTableViewCell else { return }
+        cell.getAllCellData()
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row + 1 == newsModels.count, !searchController!.isActive {
+            interactor?.loadNews()
         }
     }
 }
@@ -139,9 +176,56 @@ extension ViewController {
 extension ViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         interactor?.didTapCancelSearch()
+        navigationItem.searchController = nil
+    }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        interactor?.filterSearch(searchText: searchBar.text ?? "")
+    }
+
+//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        if searchBar.text == "" {
+//            interactor?.didTapCancelSearch()
+//            navigationItem.searchController = nil
+//        }
+//    }
+
+//
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//        guard let text = searchBar.text else { return }
+//        interactor?.filterSearch(searchText: text)
+//    }
+}
+
+extension ViewController {
+    func createSortButton() -> UIBarButtonItem {
+        return UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), style: .done, target: self, action: #selector(showSimpleAlert(_:)))
+    }
+
+    func createSearchButton() -> UIBarButtonItem {
+        return UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .done, target: self, action: #selector(showSearchBar(_:)))
     }
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        interactor?.filterSearch(searchText: searchBar.text ?? "")
+    @objc private func showSimpleAlert(_ sender: UIBarButtonItem) {
+        
+        let alert = UIAlertController(title: "By", message: nil, preferredStyle: .actionSheet)
+
+        alert.view.tintColor = .black
+
+        alert.addAction(UIAlertAction(title: "Author", style: .default, handler: { _ in
+            self.interactor?.sortByAuthor()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Date", style: .default, handler: { _ in
+            print("Tapped on date action")
+            self.interactor?.sortByPublishingDate()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    @objc private func showSearchBar(_ sender: UIBarButtonItem) {
+        navigationItem.searchController = searchController
     }
 }

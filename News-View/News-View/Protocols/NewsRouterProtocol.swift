@@ -6,5 +6,5 @@
 //
 
 protocol NewsRouterProtocol {
-    func makeViewController() -> ViewController
+    func makeViewController(with topic: String) -> ViewController
 }

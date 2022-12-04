@@ -12,10 +12,6 @@ class ArticleTableViewCell: UITableViewCell {
     
     private weak var delegate: ArticleTableViewCellDelegate?
     
-    private let numberOfCharactersOnFourLines: Int = 109
-    
-    private var fullText: NSAttributedString?
-    
     static let identifier: String = "CustomCollectionViewCell"
     
     private let myAttribute = [ NSAttributedString.Key.font: UIFont(name: "Chalkduster", size: 15.0)! ]
@@ -44,51 +40,21 @@ class ArticleTableViewCell: UITableViewCell {
         return publishedAt
     }()
     
-    private let newsImageView: UIImageView = {
-        let newsImageView = UIImageView()
-        newsImageView.backgroundColor = .darkGray
-        newsImageView.contentMode = .scaleAspectFill
-        newsImageView.translatesAutoresizingMaskIntoConstraints = false
-        newsImageView.layer.cornerRadius = 30
-        newsImageView.clipsToBounds = true
-        return newsImageView
-    }()
-    
     private let content: UILabel = {
         let content = UILabel()
         content.textColor = .green
         content.sizeToFit()
-        content.numberOfLines = 4
+        content.numberOfLines = 0
         content.lineBreakMode = .byWordWrapping
         content.translatesAutoresizingMaskIntoConstraints = false
         content.isUserInteractionEnabled = true
         return content
     }()
     
-    private let favourite: UILabel = {
-        let favourite = UILabel()
-        favourite.text = "🤍"
-        favourite.sizeToFit()
-        favourite.translatesAutoresizingMaskIntoConstraints = false
-        favourite.isUserInteractionEnabled = true
-        return favourite
-    }()
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedOnLabel(_:)))
-        content.addGestureRecognizer(tapGesture)
-        contentView.addSubview(favourite)
-        contentView.addSubview(title)
-        contentView.addSubview(author)
-        contentView.addSubview(publishedAt)
-        contentView.addSubview(newsImageView)
-        contentView.addSubview(content)
+        [title, author, publishedAt, content].forEach { contentView.addSubview($0) }
         NSLayoutConstraint.activate([
-            favourite.topAnchor
-                .constraint(equalTo: contentView.topAnchor),
-            favourite.rightAnchor
-                .constraint(equalTo: contentView.rightAnchor),
             
             title.leftAnchor
                 .constraint(equalTo: contentView.leftAnchor),
@@ -111,19 +77,8 @@ class ArticleTableViewCell: UITableViewCell {
             publishedAt.topAnchor
                 .constraint(equalTo: author.bottomAnchor),
             
-            newsImageView.topAnchor
-                .constraint(equalTo: publishedAt.bottomAnchor),
-            newsImageView.centerXAnchor
-                .constraint(equalTo: contentView.centerXAnchor),
-            newsImageView.leftAnchor
-                .constraint(equalTo: contentView.leftAnchor),
-            newsImageView.rightAnchor
-                .constraint(equalTo: contentView.rightAnchor),
-            newsImageView.heightAnchor
-                .constraint(equalToConstant: 300),
-            
             content.topAnchor
-                .constraint(equalTo: newsImageView.bottomAnchor),
+                .constraint(equalTo: publishedAt.bottomAnchor),
             content.leftAnchor
                 .constraint(equalTo: contentView.leftAnchor),
             content.rightAnchor
@@ -132,6 +87,7 @@ class ArticleTableViewCell: UITableViewCell {
                 .constraint(equalTo: contentView.bottomAnchor)
             
         ])
+        backgroundColor = .clear
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -142,43 +98,23 @@ class ArticleTableViewCell: UITableViewCell {
         self.delegate = delegate
     }
     
-    func addToFavourites() {
-        if favourite.text == "❤️" {
-            favourite.text = "🤍"
-        } else {
-        favourite.text = "❤️"
-        }
-    }
-    
-    @objc private func tappedOnLabel(_ gesture: UITapGestureRecognizer) {
-        guard let text = content.text else { return }
-        let readmoreRange = (text as NSString).range(of: "...Readmore")
-        if gesture.didTapAttributedTextInLabel(cell: self, label: content, inRange: readmoreRange) {
-            content.numberOfLines = 0
-            content.attributedText = fullText
-            delegate?.updateTableView()
-        }
-    }
-    
     private func configureContent(newsDescription: String) {
-        let truncatedDescription = "Description:\n\(newsDescription.prefix(90))"
-        let description = NSMutableAttributedString(string: truncatedDescription, attributes: myAttribute)
-        fullText = NSAttributedString(string: "Description:\n\(newsDescription)", attributes: myAttribute)
-        content.attributedText = description
-        
-        if fullText!.length >= numberOfCharactersOnFourLines {
-            DispatchQueue.main.async {
-                self.content.addTrailing(with: "", moreText: "...Readmore", moreTextFont: UIFont(name: "Chalkduster", size: 15.0)!, moreTextColor: .cyan)
-            }
-        }
+        let fullText = NSMutableAttributedString(string: "Description:\n\(newsDescription)", attributes: myAttribute)
+        content.attributedText = fullText
     }
     
     func configure(with newsModel: ArticleViewModel) {
         title.attributedText = NSAttributedString(string: "Title: \n\(newsModel.title)", attributes: myAttribute)
         author.attributedText = NSAttributedString(string: "Author: \n\(newsModel.author ?? "Unknown")", attributes: myAttribute)
         publishedAt.attributedText = NSAttributedString(string: "Published at: \n\(newsModel.publishedAt.components(separatedBy: "T")[0])", attributes: myAttribute)
-        newsImageView.image = newsModel.image
         configureContent(newsDescription: newsModel.description)
+    }
+    
+    func getAllCellData() {
+        print((title.text) ?? "Title")
+        print(author.text ?? "Author")
+        print(publishedAt.text ?? "PublishedAt")
+        print(content.text ?? "Description")
     }
 }
 
