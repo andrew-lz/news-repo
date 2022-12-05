@@ -15,4 +15,5 @@ protocol NewsInteractorProtocol: AnyObject {
     func didTapCancelSearch()
     func sortByAuthor()
     func sortByPublishingDate()
+    func printAnalyzedTable()
 }

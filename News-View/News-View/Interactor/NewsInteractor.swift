@@ -12,6 +12,7 @@ class NewsInteractor: NewsInteractorProtocol {
     
     private let newsView: NewsView
     private let networkDataFetcher: NetworkProtocol
+    private let lsaService: LsaService = LsaService()
     private var pageNumber: Int = 1
     private var articles: [Article] = []
     
@@ -47,10 +48,9 @@ class NewsInteractor: NewsInteractorProtocol {
     
     private func filteredArticles(searchText: String) -> [Article] {
         return articles.filter({ (article: Article) -> Bool in
-            
-            let articleTitle = article.title ?? "No Title"
-            let titleMatch = articleTitle.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
-            return titleMatch != nil
+            let articleDescription = article.description ?? "No Description"
+            let descriptionMatch = articleDescription.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
+            return descriptionMatch != nil
         }
         )
     }
@@ -92,5 +92,10 @@ class NewsInteractor: NewsInteractorProtocol {
     
     private func resetPageNumber() {
         pageNumber = 1
+    }
+
+    func printAnalyzedTable() {
+        self.lsaService.articles = articles
+        lsaService.analyzeArticles(with: ["Themes"])
     }
 }

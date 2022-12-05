@@ -83,8 +83,8 @@ class ViewController: UIViewController {
     private func setupNavigationBar() {
 //        navigationItem.searchController = searchController
 //        navigationItem.searchController?.isActive = false
-        navigationItem.leftBarButtonItem = createSortButton()
         navigationItem.rightBarButtonItem = createSearchButton()
+        navigationItem.leftBarButtonItems = [createSortButton(), createAnalyzeButton()]
         navigationController?.navigationBar.barTintColor = .white
     }
     
@@ -182,31 +182,22 @@ extension ViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         interactor?.filterSearch(searchText: searchBar.text ?? "")
     }
-
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text == "" {
-//            interactor?.didTapCancelSearch()
-//            navigationItem.searchController = nil
-//        }
-//    }
-
-//
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        guard let text = searchBar.text else { return }
-//        interactor?.filterSearch(searchText: text)
-//    }
 }
 
 extension ViewController {
     func createSortButton() -> UIBarButtonItem {
-        return UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), style: .done, target: self, action: #selector(showSimpleAlert(_:)))
+        return UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), style: .done, target: self, action: #selector(showSortAlert(_:)))
+    }
+
+    func createAnalyzeButton() -> UIBarButtonItem {
+        return UIBarButtonItem(image: UIImage(systemName: "doc"), style: .done, target: self, action: #selector(showLsaController(_:)))
     }
 
     func createSearchButton() -> UIBarButtonItem {
         return UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .done, target: self, action: #selector(showSearchBar(_:)))
     }
     
-    @objc private func showSimpleAlert(_ sender: UIBarButtonItem) {
+    @objc private func showSortAlert(_ sender: UIBarButtonItem) {
         
         let alert = UIAlertController(title: "By", message: nil, preferredStyle: .actionSheet)
 
@@ -225,7 +216,12 @@ extension ViewController {
         self.present(alert, animated: true, completion: nil)
     }
 
+    @objc private func showLsaController(_ sender: UIBarButtonItem) {
+        self.present(LsaTableViewController(collectionViewLayout: CollectionViewLayout()), animated: true)
+    }
+
     @objc private func showSearchBar(_ sender: UIBarButtonItem) {
         navigationItem.searchController = searchController
+        interactor?.printAnalyzedTable()
     }
 }
