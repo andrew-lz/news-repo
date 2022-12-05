@@ -14,9 +14,9 @@ class NetworkDataFetcher: NetworkProtocol {
 //        "19aca4fda67d47f3b866f0ee8028f6fd"
 //            "220fba25b6d14383908e89872d1136da"
 //               "f1aa354959d04f21b021d83392ce310a"
-//    "828cdc6e609545239d8d695f3660d6d1"
+    "828cdc6e609545239d8d695f3660d6d1"
 //        "e0ffbfae416e485eae49dfba99b2ac24"
-        "f2062fdd2a114b7bb1134fe2609bbe37"
+//        "f2062fdd2a114b7bb1134fe2609bbe37"
     private let topic: String
 
     init(topic: String) {
@@ -43,7 +43,7 @@ class NetworkDataFetcher: NetworkProtocol {
     private func formUrl(before pageNumber: Int) -> String {
         let language = "en"
         let q = topic
-        let pageSize = "50"
+        let pageSize = "100"
         let scheme = "https"
         let host = "newsapi.org"
         let path = "/v2/everything"

@@ -99,14 +99,14 @@ class ArticleTableViewCell: UITableViewCell {
     }
     
     private func configureContent(newsDescription: String) {
-        let fullText = NSMutableAttributedString(string: "Description:\n\(newsDescription)", attributes: myAttribute)
+        let fullText = NSMutableAttributedString(string: "DESCRIPTION:\n\(newsDescription)", attributes: myAttribute)
         content.attributedText = fullText
     }
     
     func configure(with newsModel: ArticleViewModel) {
-        title.attributedText = NSAttributedString(string: "Title: \n\(newsModel.title)", attributes: myAttribute)
-        author.attributedText = NSAttributedString(string: "Author: \n\(newsModel.author ?? "Unknown")", attributes: myAttribute)
-        publishedAt.attributedText = NSAttributedString(string: "Published at: \n\(newsModel.publishedAt.components(separatedBy: "T")[0])", attributes: myAttribute)
+        title.attributedText = NSAttributedString(string: "TITLE: \n\(newsModel.title)", attributes: myAttribute)
+        author.attributedText = NSAttributedString(string: "AUTHOR: \n\(newsModel.author ?? "Unknown")", attributes: myAttribute)
+        publishedAt.attributedText = NSAttributedString(string: "PUBLISHED AT: \n\(newsModel.publishedAt.components(separatedBy: "T")[0])", attributes: myAttribute)
         configureContent(newsDescription: newsModel.description)
     }
     
