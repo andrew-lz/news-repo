@@ -94,8 +94,13 @@ class NewsInteractor: NewsInteractorProtocol {
         pageNumber = 1
     }
 
-    func printAnalyzedTable() {
+    func printAnalyzedTable() -> [ThemeStatistics] {
         self.lsaService.articles = articles
-        lsaService.analyzeArticles(with: ["Themes"])
+        let themesStatistics = lsaService.analyzeArticles(with: ["Themes"])
+        for themeStatistics in themesStatistics {
+            print(themeStatistics.theme)
+            print(themeStatistics.articleAnalyze)
+        }
+        return themesStatistics
     }
 }

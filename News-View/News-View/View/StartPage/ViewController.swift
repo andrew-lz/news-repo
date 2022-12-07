@@ -18,7 +18,6 @@ class ViewController: UIViewController {
     private var searchController: UISearchController?
     
     private let refreshControl = UIRefreshControl()
-
     
     private let loadingIndicator: UIActivityIndicatorView = {
         let loadingIndicator = UIActivityIndicatorView()
@@ -74,18 +73,13 @@ class ViewController: UIViewController {
         searchController?.obscuresBackgroundDuringPresentation = false
         searchController?.searchBar.placeholder = "Search by Title"
         searchController?.searchBar.tintColor = .cyan
-        searchController?.searchBar.searchTextField.textColor = .white
         searchController?.searchBar.delegate = self
-//        searchController?.searchBar.showsSearchResultsButton = true
         searchController?.searchBar.showsCancelButton = true
     }
     
     private func setupNavigationBar() {
-//        navigationItem.searchController = searchController
-//        navigationItem.searchController?.isActive = false
         navigationItem.rightBarButtonItem = createSearchButton()
-        navigationItem.leftBarButtonItems = [createSortButton(), createAnalyzeButton()]
-        navigationController?.navigationBar.barTintColor = .white
+        navigationItem.leftBarButtonItem = createAnalyzeButton()
     }
     
     @objc private func filter() {
@@ -217,11 +211,10 @@ extension ViewController {
     }
 
     @objc private func showLsaController(_ sender: UIBarButtonItem) {
-        self.present(LsaTableViewController(collectionViewLayout: CollectionViewLayout()), animated: true)
+        navigationController?.pushViewController(LsaTableViewController(themesStatistics: interactor?.printAnalyzedTable() ?? []), animated: true)
     }
 
     @objc private func showSearchBar(_ sender: UIBarButtonItem) {
         navigationItem.searchController = searchController
-        interactor?.printAnalyzedTable()
     }
 }

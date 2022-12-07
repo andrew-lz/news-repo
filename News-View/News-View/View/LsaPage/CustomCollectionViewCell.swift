@@ -12,7 +12,9 @@ class CustomCollectionViewCell: UICollectionViewCell {
 
     private let tfIdfOfArticleLabel: UILabel = {
         let label = UILabel()
+        label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
         return label
     }()
 
@@ -21,8 +23,12 @@ class CustomCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(tfIdfOfArticleLabel)
         NSLayoutConstraint.activate([
             tfIdfOfArticleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            tfIdfOfArticleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            tfIdfOfArticleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            tfIdfOfArticleLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor)
         ])
+        backgroundColor = .black
+        layer.borderColor = UIColor.white.cgColor
+        layer.borderWidth = 1
     }
 
     required init?(coder: NSCoder) {
