@@ -17,8 +17,6 @@ class LsaTableViewController : UICollectionViewController {
 
     private var articlesNumbers = [Int]()
 
-    private var currentThemeIndex = 0
-
     override init(collectionViewLayout layout: UICollectionViewLayout) {
         super.init(collectionViewLayout: layout)
     }
@@ -56,10 +54,10 @@ class LsaTableViewController : UICollectionViewController {
         tableMatrix = themesStatistics.map({ themeStatistics in
             themeStatisticsPoints = []
             for articleNumber in articlesNumbers {
-                if themeStatistics.articleAnalyze.contains(where: { $0.0 == articleNumber }) {
-                    themeStatisticsPoints += themeStatistics.articleAnalyze
+                if let artAnalyzed = themeStatistics.articleAnalyze.first(where: { $0.0 == articleNumber }) {
+                    themeStatisticsPoints.append(artAnalyzed)
                 } else {
-                    themeStatisticsPoints += [(0, 0)]
+                    themeStatisticsPoints.append((0, 0))
                 }
             }
             print(themeStatisticsPoints)
@@ -85,12 +83,11 @@ extension LsaTableViewController {
                 cell.configure(with: "")
             } else {
                 let currentPoint = articlesNumbers[indexPath.row - 1]
-                cell.configure(with: "\(currentPoint)")
+                cell.configure(with: "N \(currentPoint)")
             }
         }
         else if indexPath.row == 0 {
-            cell.configure(with: themesStatistics[currentThemeIndex].theme)
-            currentThemeIndex += 1
+            cell.configure(with: themesStatistics[indexPath.section - 1].theme)
         }
         else {
             let currentPoint = tableMatrix[indexPath.section - 1].articleAnalyze[indexPath.row - 1]
